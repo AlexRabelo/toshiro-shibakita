@@ -1,48 +1,42 @@
-<html>
-
-<head>
-<title>Exemplo PHP</title>
-</head>
-<body>
-
 <?php
-ini_set("display_errors", 1);
-header('Content-Type: text/html; charset=iso-8859-1');
+// filepath: c:\Users\vialo\OneDrive\Documents\GitHub\AlexRabelo\toshiro-shibakita\toshiro-shibakita\index.php
 
+// Exibe a versão do PHP no navegador
+echo "Versão do PHP: " . phpversion() . "<br>";
 
+// Configurações de conexão com o banco de dados usando variáveis de ambiente
+$servername = getenv('DB_HOST') ?: '54.234.153.24'; // Endereço do servidor MySQL
+$username = getenv('DB_USER') ?: 'root';           // Nome de usuário do banco de dados
+$password = getenv('DB_PASS') ?: 'Senha123';       // Senha do banco de dados
+$dbname = getenv('DB_NAME') ?: 'meubanco';         // Nome do banco de dados
 
-echo 'Versao Atual do PHP: ' . phpversion() . '<br>';
+// Cria uma conexão com o banco de dados
+$conn = new mysqli($servername, $username, $password, $dbname);
 
-$servername = "54.234.153.24";
-$username = "root";
-$password = "Senha123";
-$database = "meubanco";
-
-// Criar conexão
-
-
-$link = new mysqli($servername, $username, $password, $database);
-
-/* check connection */
-if (mysqli_connect_errno()) {
-    printf("Connect failed: %s\n", mysqli_connect_error());
-    exit();
+// Verifica se a conexão foi bem-sucedida
+if ($conn->connect_error) {
+    die("Falha na conexão: " . $conn->connect_error);
 }
 
-$valor_rand1 =  rand(1, 999);
-$valor_rand2 = strtoupper(substr(bin2hex(random_bytes(4)), 1));
-$host_name = gethostname();
+// Gera valores aleatórios para inserção no banco de dados
+$alunoID = rand(1, 1000);
+$nome = "Nome" . rand(1, 100);
+$sobrenome = "Sobrenome" . rand(1, 100);
+$endereco = "Endereco" . rand(1, 100);
+$cidade = "Cidade" . rand(1, 100);
+$host = gethostname(); // Obtém o nome do host atual
 
+// Cria a query SQL para inserir os dados na tabela
+$sql = "INSERT INTO dados (AlunoID, Nome, Sobrenome, Endereco, Cidade, Host)
+VALUES ('$alunoID', '$nome', '$sobrenome', '$endereco', '$cidade', '$host')";
 
-$query = "INSERT INTO dados (AlunoID, Nome, Sobrenome, Endereco, Cidade, Host) VALUES ('$valor_rand1' , '$valor_rand2', '$valor_rand2', '$valor_rand2', '$valor_rand2','$host_name')";
-
-
-if ($link->query($query) === TRUE) {
-  echo "New record created successfully";
+// Executa a query e verifica se foi bem-sucedida
+if ($conn->query($sql) === TRUE) {
+    echo "Novo registro criado com sucesso!<br>";
 } else {
-  echo "Error: " . $link->error;
+    echo "Erro: " . $sql . "<br>" . $conn->error;
 }
 
+// Fecha a conexão com o banco de dados
+$conn->close();
 ?>
-</body>
-</html>
